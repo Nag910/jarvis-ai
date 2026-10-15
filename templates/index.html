@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="csrf" content="{{ csrf }}">
+<title>Jarvis AI</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="brand"><span class="dot"></span>JARVIS<small>AI</small></div>
+    <nav>
+      <button data-view="dashboard" class="on">◈ <span>Dashboard</span></button>
+      <button data-view="assistant">◉ <span>AI Assistant</span></button>
+      <button data-view="tasks">☑ <span>Task Planner</span></button>
+      <button data-view="reminders">⏰ <span>Reminders</span></button>
+      <button data-view="notes">✎ <span>Notes</span></button>
+      <button data-view="settings">⚙ <span>Settings</span></button>
+    </nav>
+  </aside>
+  <main>
+    <header class="top"><b id="clock"></b><span class="status"><i></i> Online · Local &amp; offline</span></header>
+
+    <section id="view-dashboard" class="view on">
+      <div class="hero card">
+        <svg class="robot" viewBox="0 0 200 240" aria-label="Jarvis robot">
+          <line x1="100" y1="12" x2="100" y2="38" stroke="#22e4ff" stroke-width="4"/><circle class="pulse" cx="100" cy="10" r="7" fill="#a45bff"/>
+          <rect x="45" y="38" width="110" height="80" rx="26" fill="#0d1733" stroke="#22e4ff" stroke-width="3"/>
+          <rect x="62" y="58" width="76" height="36" rx="14" fill="#050a1c"/>
+          <ellipse class="eye" cx="82" cy="76" rx="9" ry="10" fill="#22e4ff"/><ellipse class="eye" cx="118" cy="76" rx="9" ry="10" fill="#22e4ff"/>
+          <rect x="55" y="128" width="90" height="80" rx="20" fill="#0d1733" stroke="#a45bff" stroke-width="3"/>
+          <circle class="pulse" cx="100" cy="168" r="17" fill="#22e4ff"/><circle cx="100" cy="168" r="8" fill="#fff" opacity=".8"/>
+          <rect x="22" y="136" width="24" height="56" rx="12" fill="#0d1733" stroke="#22e4ff" stroke-width="3"/>
+          <rect x="154" y="136" width="24" height="56" rx="12" fill="#0d1733" stroke="#22e4ff" stroke-width="3"/>
+          <rect x="72" y="210" width="20" height="24" rx="6" fill="#0d1733" stroke="#a45bff" stroke-width="3"/>
+          <rect x="108" y="210" width="20" height="24" rx="6" fill="#0d1733" stroke="#a45bff" stroke-width="3"/>
+        </svg>
+        <div><h1>Welcome back.</h1><p>Jarvis is ready. Plan tasks, set reminders, keep notes, or ask the assistant.</p>
+          <div class="bar"><div id="d-bar"></div></div><small id="d-pct">0% of tasks completed</small></div>
+      </div>
+      <div class="stats">
+        <div class="card stat"><b id="d-total">0</b>Total tasks</div>
+        <div class="card stat"><b id="d-done">0</b>Completed</div>
+        <div class="card stat"><b id="d-pend">0</b>Pending</div>
+        <div class="card stat"><b id="d-up">0</b>Upcoming reminders</div>
+      </div>
+      <div class="cols">
+        <div class="card"><h3>Next reminders</h3><ul id="d-rem" class="plain"></ul></div>
+        <div class="card"><h3>Recent notes</h3><ul id="d-notes" class="plain"></ul></div>
+      </div>
+    </section>
+
+    <section id="view-assistant" class="view">
+      <div class="card chat">
+        <div class="tag">Local rule-based engine · works offline · not an AI language model</div>
+        <div id="msgs" class="msgs"></div>
+        <div class="quick">
+          <button data-q="What can you do?">What can you do?</button>
+          <button data-q="Show my tasks">Show my tasks</button>
+          <button data-q="Create a task">Create a task</button>
+          <button data-q="Show stats">Stats</button>
+        </div>
+        <div class="send"><input id="chat-in" maxlength="500" placeholder="Type a message…" autocomplete="off"><button id="chat-send" class="btn">Send</button></div>
+      </div>
+    </section>
+
+    <section id="view-tasks" class="view">
+      <div class="card"><h3 id="t-head">Add task</h3>
+        <form id="t-form" class="form">
+          <input id="t-title" maxlength="100" placeholder="Task title *">
+          <textarea id="t-desc" maxlength="500" placeholder="Description"></textarea>
+          <div class="row"><select id="t-pri"><option value="low">Low</option><option value="medium" selected>Medium</option><option value="high">High</option></select>
+          <input id="t-due" type="date"></div>
+          <div class="row"><button class="btn" id="t-save">Save task</button><button type="button" class="btn ghost" id="t-cancel" hidden>Cancel</button></div>
+        </form>
+      </div>
+      <div class="card"><div class="row between"><div class="filters" id="t-filters">
+        <button data-f="all" class="on">All</button><button data-f="pending">Pending</button><button data-f="completed">Completed</button></div>
+        <small id="t-count"></small></div><ul id="t-list" class="list"></ul></div>
+    </section>
+
+    <section id="view-reminders" class="view">
+      <div class="card"><h3 id="r-head">Add reminder</h3>
+        <form id="r-form" class="form">
+          <input id="r-title" maxlength="100" placeholder="Reminder title *">
+          <textarea id="r-desc" maxlength="500" placeholder="Description"></textarea>
+          <input id="r-at" type="datetime-local">
+          <div class="row"><button class="btn" id="r-save">Save reminder</button></div>
+        </form>
+        <small>Reminders alert you only while this page is open in your browser.</small>
+      </div>
+      <div class="card"><h3>Overdue</h3><ul id="r-over" class="list"></ul><h3>Upcoming</h3><ul id="r-up" class="list"></ul><h3>Done</h3><ul id="r-done" class="list"></ul></div>
+    </section>
+
+    <section id="view-notes" class="view">
+      <div class="card"><h3 id="n-head">New note</h3>
+        <form id="n-form" class="form">
+          <input id="n-title" maxlength="100" placeholder="Note title *">
+          <textarea id="n-content" maxlength="5000" rows="5" placeholder="Write your note…"></textarea>
+          <div class="row"><button class="btn" id="n-save">Save note</button><button type="button" class="btn ghost" id="n-cancel" hidden>Cancel</button></div>
+        </form>
+      </div>
+      <div class="card"><input id="n-search" placeholder="Search notes…" maxlength="100"><ul id="n-list" class="list"></ul></div>
+    </section>
+
+    <section id="view-settings" class="view">
+      <div class="card"><h3>Settings</h3>
+        <label class="check"><input type="checkbox" id="s-voice"> Speak assistant replies aloud (uses your Mac's built-in voice)</label>
+        <p id="s-voice-note"></p>
+        <button class="btn ghost" id="s-clear">Clear chat history</button>
+        <h3>About</h3>
+        <p>Jarvis AI is a <b>local single-user app</b>: no login, no cloud, no internet. All data is stored in a SQLite file on this computer. The assistant is a rule-based engine, not a language model. Microphone input is intentionally omitted because browser speech recognition sends audio to online servers.</p>
+      </div>
+    </section>
+  </main>
+</div>
+<div id="toasts"></div>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
